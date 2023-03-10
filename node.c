@@ -22,13 +22,15 @@ void initDistanceTable(struct distance_table* dt) {
 bool updateCosts(int src_id, int rx_id, struct distance_table* src_dt, struct rtpkt* rx_dt, bool neighbor[]) {
   bool update = false;
   for(int i = 0; i < MAX_NODES; i++) {
+    /* Store neighbor dt info in this dt */
     src_dt->costs[i][rx_id] = rx_dt->mincost[i];
+    /* If current cost is > than sender nodes mincost to dst + the distance to the sender => update. */
     if(src_dt->costs[i][src_id] > rx_dt->mincost[i] + src_dt->costs[rx_id][src_id]) {
       src_dt->costs[i][src_id] = rx_dt->mincost[i] + src_dt->costs[rx_id][src_id];
       update = true;
     }
   }
-  /* Updating non-neighbors based on neighbors distance tables. */
+  /* Updating non-neighbors based on neighbors distance tables/mincost and stores it in this dt. */
   for(int i = 0; i < MAX_NODES; i++) {
     for(int j = 0; j < MAX_NODES; j++) {
       if(src_dt->costs[j][i] > src_dt->costs[i][j] && !neighbor[i]) {
